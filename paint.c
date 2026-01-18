@@ -1,20 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
-#include <math.h>
-#include <string.h>
 
-#define WIDTH 1120
-#define HEIGHT 840
+#define WIDTH 1280
+#define HEIGHT 720
 #define FPS 160
-#define RADIUS 20
 #define MAX_CIRCLES 50000
 #define MAX_COLORS MAX_CIRCLES
+#define MAX_THICKNESS MAX_CIRCLES
 #define NUMBER_COLORS 7
+#define NUMBER_THICKNESSES 3
+
+#define SMALL 5
+#define MEDIUM 10
+#define LARGE 20
 // #define INITIAL_SIZE 20
 
-#define POS_X_RECT 15
-#define POS_Y_RECT 15
+#define POS_X_COLOR_RECT 20
+#define POS_Y_COLOR_RECT 20
+#define POS_X_THICKNESS_RECT (WIDTH-60)
+#define POS_Y_THICKNESS_RECT POS_Y_COLOR_RECT
 #define WIDTH_RECT 40
 #define HEIGHT_RECT 40
 
@@ -37,30 +42,30 @@ void handleMemoryAlloc(int initialSize) {
 			
 			pmousePositions = temp;
 			printf("[DEBUG: The capacity has increased to: %d]\n", capacity);
-			}
-			pmousePositions[i] = mousePositions[i];
-			}
-			}
-			*/
+		}
+		pmousePositions[i] = mousePositions[i];
+	}
+}
+*/
 		
 Vector2 mousePositions[MAX_CIRCLES];
 
 void createColorButtons(Color* colors) {
 	int j = 0;
 	for (j = 0; j < NUMBER_COLORS; j++) {
-		DrawRectangle(POS_X_RECT + 40*j, POS_Y_RECT, WIDTH_RECT, HEIGHT_RECT, colors[j]);
+		DrawRectangle(POS_X_COLOR_RECT + WIDTH_RECT*j, POS_Y_COLOR_RECT, WIDTH_RECT, HEIGHT_RECT, colors[j]);
 	}
-	DrawRectangleLines(POS_X_RECT + 40*j - 40, POS_Y_RECT, WIDTH_RECT, HEIGHT_RECT, WHITE);
+	DrawRectangleLines(POS_X_COLOR_RECT + WIDTH_RECT*j - WIDTH_RECT, POS_Y_COLOR_RECT, WIDTH_RECT, HEIGHT_RECT, WHITE);
 }
 
-Color color[MAX_COLORS];
-Color actualColor;
+Color colorArray[MAX_COLORS];
+Color actualColor = {255, 255, 255, 255}; // WHITE
 int canDraw = 1;
 
 Color getColor(Vector2 mousePos, Color* colors) {
-	if (mousePos.y >= POS_Y_RECT && mousePos.y <= POS_Y_RECT + HEIGHT_RECT) {
+	if (mousePos.y >= POS_Y_COLOR_RECT && mousePos.y <= POS_Y_COLOR_RECT + HEIGHT_RECT) {
 		for (int k = 0; k < NUMBER_COLORS; k++) {
-			if (mousePos.x >= POS_X_RECT + 40*k && mousePos.x <= POS_X_RECT + 40*k + 40) {
+			if (mousePos.x >= POS_X_COLOR_RECT + WIDTH_RECT*k && mousePos.x <= POS_X_COLOR_RECT + WIDTH_RECT*k + WIDTH_RECT) {
 				if (IsMouseButtonPressed(0)) {
 					actualColor = colors[k];
 				}
@@ -71,14 +76,40 @@ Color getColor(Vector2 mousePos, Color* colors) {
 	return actualColor;
 }
 
+int thicknessArray[MAX_THICKNESS];
+int actualThickness = SMALL;
+
+void createThicknessButtons(int* thickness) {
+	for (int j = 0; j < NUMBER_THICKNESSES; j++) {
+		DrawRectangle(POS_X_THICKNESS_RECT - WIDTH_RECT*j, POS_Y_THICKNESS_RECT, -WIDTH_RECT, HEIGHT_RECT, BLACK);
+		DrawRectangleLines(POS_X_THICKNESS_RECT - WIDTH_RECT*j, POS_Y_THICKNESS_RECT, -WIDTH_RECT, HEIGHT_RECT, WHITE);
+		DrawCircle((POS_X_THICKNESS_RECT - WIDTH_RECT*j - WIDTH_RECT) + WIDTH_RECT / 2, (POS_Y_THICKNESS_RECT) + HEIGHT_RECT / 2, thickness[j], WHITE);
+	}
+}
+
+int getThickness(Vector2 mousePos, int* thickness) {
+	if (mousePos.y >= POS_Y_THICKNESS_RECT && mousePos.y <= POS_Y_THICKNESS_RECT + HEIGHT_RECT) {
+		for (int j = 0; j < NUMBER_THICKNESSES; j++) {
+			if ((mousePos.x >= POS_X_THICKNESS_RECT - WIDTH_RECT*j - WIDTH_RECT) && (mousePos.x <= POS_X_THICKNESS_RECT - WIDTH_RECT*j)) {
+				if (IsMouseButtonPressed(0)) {
+					actualThickness = thickness[j];
+				}
+				canDraw = 0;
+			}
+		}
+	}
+	return actualThickness;
+}
+
 int i = 0;
 
-void drawCircleOnMouse(float radius, Vector2* mousePositions, Color* colors) {
+void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
 	if (IsMouseButtonDown(0)) {
 		// handleMemoryAlloc(i);
 		canDraw = 1;
-		color[i] = getColor(mousePos, colors);
+		colorArray[i] = getColor(mousePos, colors);
+		thicknessArray[i] = getThickness(mousePos, thickness);
 		for (int j = 0; j < i; j++) {
 			if (mousePos.x == mousePositions[j].x && mousePos.y == mousePositions[j].y) {
 				canDraw = 0;
@@ -92,22 +123,24 @@ void drawCircleOnMouse(float radius, Vector2* mousePositions, Color* colors) {
 	};
 
 	for (int j = 0; j < i; j++) {
-		DrawCircle(mousePositions[j].x, mousePositions[j].y, radius, color[j]);
+		DrawCircle(mousePositions[j].x, mousePositions[j].y, thicknessArray[j], colorArray[j]);
 	}
 
 }
 
 int main() {
 	Color colors[NUMBER_COLORS] = {WHITE, RED, GREEN, BLUE, PURPLE, ORANGE, BLACK};
+	int thickness[NUMBER_THICKNESSES] = {LARGE, MEDIUM, SMALL};
 	InitWindow(WIDTH, HEIGHT, "Paint v1.0");
 	SetTargetFPS(FPS);
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 			ClearBackground(BLACK);
-			drawCircleOnMouse(RADIUS, mousePositions, colors);
+			drawCircleOnMouse(thickness, mousePositions, colors);
 			createColorButtons(colors);
+			createThicknessButtons(thickness);
 			DrawText("Paint v1.0", WIDTH/2 - 70, 15, 30, WHITE);
-			DrawFPS(WIDTH - 100, 5);
+			DrawFPS(WIDTH - 100, HEIGHT - 30);
 		EndDrawing();
 		printf("%d\n", i);
 	}
