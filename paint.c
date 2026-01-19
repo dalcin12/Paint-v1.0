@@ -105,6 +105,9 @@ int i = 0;
 
 void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
+
+	DrawCircleLines(mousePos.x, mousePos.y, getThickness(mousePos, thickness), getColor(mousePos, colors));
+	
 	if (IsMouseButtonDown(0)) {
 		// handleMemoryAlloc(i);
 		canDraw = 1;
