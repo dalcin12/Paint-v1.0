@@ -66,6 +66,7 @@ Color getColor(Vector2 mousePos, Color* colors) {
 	if (mousePos.y >= POS_Y_COLOR_RECT && mousePos.y <= POS_Y_COLOR_RECT + HEIGHT_RECT) {
 		for (int k = 0; k < NUMBER_COLORS; k++) {
 			if (mousePos.x >= POS_X_COLOR_RECT + WIDTH_RECT*k && mousePos.x <= POS_X_COLOR_RECT + WIDTH_RECT*k + WIDTH_RECT) {
+				ShowCursor();
 				if (IsMouseButtonPressed(0)) {
 					actualColor = colors[k];
 				}
@@ -91,6 +92,7 @@ int getThickness(Vector2 mousePos, int* thickness) {
 	if (mousePos.y >= POS_Y_THICKNESS_RECT && mousePos.y <= POS_Y_THICKNESS_RECT + HEIGHT_RECT) {
 		for (int j = 0; j < NUMBER_THICKNESSES; j++) {
 			if ((mousePos.x >= POS_X_THICKNESS_RECT - WIDTH_RECT*j - WIDTH_RECT) && (mousePos.x <= POS_X_THICKNESS_RECT - WIDTH_RECT*j)) {
+				ShowCursor();
 				if (IsMouseButtonPressed(0)) {
 					actualThickness = thickness[j];
 				}
@@ -105,7 +107,6 @@ int i = 0;
 
 void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
-	
 	if (IsMouseButtonDown(0)) {
 		// handleMemoryAlloc(i);
 		canDraw = 1;
@@ -117,6 +118,7 @@ void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 			}
 		}
 		if (canDraw) {
+			HideCursor();
 			mousePositions[i].x = mousePos.x;
 			mousePositions[i].y = mousePos.y;
 			i++;
