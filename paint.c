@@ -105,8 +105,6 @@ int i = 0;
 
 void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
-
-	DrawCircleLines(mousePos.x, mousePos.y, getThickness(mousePos, thickness), getColor(mousePos, colors));
 	
 	if (IsMouseButtonDown(0)) {
 		// handleMemoryAlloc(i);
@@ -128,6 +126,9 @@ void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
 	for (int j = 0; j < i; j++) {
 		DrawCircle(mousePositions[j].x, mousePositions[j].y, thicknessArray[j], colorArray[j]);
 	}
+
+	Color outlineColor = ColorIsEqual(getColor(mousePos, colors), BLACK) ? WHITE : getColor(mousePos, colors);
+	DrawCircleLines(mousePos.x, mousePos.y, getThickness(mousePos, thickness), outlineColor);
 
 }
 
