@@ -1,4 +1,4 @@
-### Basic Paint in C
+## Basic Paint in C
  
 #### Welcome! This project is a implementation of a basic "Paint" program in C.
 
