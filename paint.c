@@ -14,7 +14,6 @@
 #define SMALL 5
 #define MEDIUM 10
 #define LARGE 20
-// #define INITIAL_SIZE 20
 
 #define POS_X_COLOR_RECT 20
 #define POS_Y_COLOR_RECT 20
@@ -22,6 +21,7 @@
 #define POS_Y_THICKNESS_RECT POS_Y_COLOR_RECT
 #define WIDTH_RECT 40
 #define HEIGHT_RECT 40
+// #define INITIAL_SIZE 20
 
 //	int size = 0;
 //	int capacity = INITIAL_SIZE;
@@ -47,8 +47,14 @@ void handleMemoryAlloc(int initialSize) {
 	}
 }
 */
+
+typedef struct Circle{
+	Color color;
+	int thickness;
+	Vector2 positions;
+} Circle;
 		
-Vector2 mousePositions[MAX_CIRCLES];
+// Vector2 mousePositions[MAX_CIRCLES];
 
 void createColorButtons(Color* colors) {
 	int j = 0;
@@ -58,13 +64,14 @@ void createColorButtons(Color* colors) {
 	DrawRectangleLines(POS_X_COLOR_RECT + WIDTH_RECT*j - WIDTH_RECT, POS_Y_COLOR_RECT, WIDTH_RECT, HEIGHT_RECT, WHITE);
 }
 
-Color colorArray[MAX_COLORS];
+// Color colorArray[MAX_COLORS];
 Color actualColor = {255, 255, 255, 255}; // WHITE
 int canDraw = 1;
 
 Color getColor(Vector2 mousePos, Color* colors) {
+	int k = 0;
 	if (mousePos.y >= POS_Y_COLOR_RECT && mousePos.y <= POS_Y_COLOR_RECT + HEIGHT_RECT) {
-		for (int k = 0; k < NUMBER_COLORS; k++) {
+		for (k = 0; k < NUMBER_COLORS; k++) {
 			if (mousePos.x >= POS_X_COLOR_RECT + WIDTH_RECT*k && mousePos.x <= POS_X_COLOR_RECT + WIDTH_RECT*k + WIDTH_RECT) {
 				ShowCursor();
 				if (IsMouseButtonPressed(0)) {
@@ -77,8 +84,10 @@ Color getColor(Vector2 mousePos, Color* colors) {
 	return actualColor;
 }
 
-int thicknessArray[MAX_THICKNESS];
+// int thicknessArray[MAX_THICKNESS];
 int actualThickness = SMALL;
+
+Circle circlesArray[50000];
 
 void createThicknessButtons(int* thickness) {
 	for (int j = 0; j < NUMBER_THICKNESSES; j++) {
@@ -105,28 +114,28 @@ int getThickness(Vector2 mousePos, int* thickness) {
 
 int i = 0;
 
-void drawCircleOnMouse(int* thickness, Vector2* mousePositions, Color* colors) {
+void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
 	if (IsMouseButtonDown(0)) {
-		// handleMemoryAlloc(i);
 		canDraw = 1;
-		colorArray[i] = getColor(mousePos, colors);
-		thicknessArray[i] = getThickness(mousePos, thickness);
+		circlesA[i].color = getColor(mousePos, colors);
+		circlesA[i].thickness = getThickness(mousePos, thickness);
 		for (int j = 0; j < i; j++) {
-			if (mousePos.x == mousePositions[j].x && mousePos.y == mousePositions[j].y) {
+			if (mousePos.x == circlesA[j].positions.x && mousePos.y == circlesA[j].positions.y) {
 				canDraw = 0;
 			}
 		}
 		if (canDraw) {
 			HideCursor();
-			mousePositions[i].x = mousePos.x;
-			mousePositions[i].y = mousePos.y;
+			circlesA[i].positions.x = mousePos.x;
+			circlesA[i].positions.y = mousePos.y;
 			i++;
 		}
 	};
 
 	for (int j = 0; j < i; j++) {
-		DrawCircle(mousePositions[j].x, mousePositions[j].y, thicknessArray[j], colorArray[j]);
+		DrawCircle(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].thickness, circlesA[j].color);
+		
 	}
 
 	Color outlineColor = ColorIsEqual(getColor(mousePos, colors), BLACK) ? WHITE : getColor(mousePos, colors);
@@ -142,7 +151,7 @@ int main() {
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 			ClearBackground(BLACK);
-			drawCircleOnMouse(thickness, mousePositions, colors);
+			drawCircleOnMouse(thickness, circlesArray, colors);
 			createColorButtons(colors);
 			createThicknessButtons(thickness);
 			DrawText("Paint v1.0", WIDTH/2 - 70, 15, 30, WHITE);
