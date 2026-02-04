@@ -87,7 +87,7 @@ Color getColor(Vector2 mousePos, Color* colors) {
 // int thicknessArray[MAX_THICKNESS];
 int actualThickness = SMALL;
 
-Circle circlesArray[50000];
+Circle circlesArray[WIDTH * HEIGHT]; // WIDTH * HEIGHT will cover up all the screen pixels
 
 void createThicknessButtons(int* thickness) {
 	for (int j = 0; j < NUMBER_THICKNESSES; j++) {
