@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
+#include <string.h>
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -114,6 +115,28 @@ int getThickness(Vector2 mousePos, int* thickness) {
 
 int i = 0;
 
+//Clear background
+Vector2 buttonPos = {(WIDTH-50)/2, HEIGHT - 50};
+
+void createClearBackgroundButton(Circle *circlesArray, int size){
+	Vector2 mousePos = GetMousePosition();
+	if(mousePos.x < (buttonPos.x + 50) && mousePos.y < (buttonPos.y + 50) &&
+	mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y) 
+	){
+		DrawRectangle(buttonPos.x, buttonPos.y , 50,30, RED);
+		DrawText("CLEAR", buttonPos.x, buttonPos.y, 10, WHITE);
+		if(IsMouseButtonPressed(0)){
+			memset(circlesArray, 0, size*sizeof(Circle)); //para dar clear na memoria por meio da lib string.h
+			i = 0;
+		}
+	}else{
+		DrawRectangle(buttonPos.x, buttonPos.y , 50,30, WHITE);
+		DrawText("CLEAR", buttonPos.x, buttonPos.y, 10, RED);
+	}
+}
+
+
+
 void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
 	if (IsMouseButtonDown(0)) {
@@ -124,6 +147,10 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 			if (mousePos.x == circlesA[j].positions.x && mousePos.y == circlesA[j].positions.y) {
 				canDraw = 0;
 			}
+			if(mousePos.x < (buttonPos.x + 50) && mousePos.y < (buttonPos.y + 50) &&
+	mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y)){
+		canDraw = 0;
+	}
 		}
 		if (canDraw) {
 			HideCursor();
@@ -145,6 +172,7 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 }
 
 int main() {
+	Circle *circlesArray = (Circle *)malloc(500 * sizeof(Circle));
 	Color colors[NUMBER_COLORS] = {WHITE, RED, GREEN, BLUE, PURPLE, ORANGE, BLACK};
 	int thickness[NUMBER_THICKNESSES] = {LARGE, MEDIUM, SMALL};
 	InitWindow(WIDTH, HEIGHT, "Paint v1.0");
@@ -155,6 +183,7 @@ int main() {
 			drawCircleOnMouse(thickness, circlesArray, colors);
 			createColorButtons(colors);
 			createThicknessButtons(thickness);
+			createClearBackgroundButton(circlesArray, i);
 			DrawText("Paint v1.0", WIDTH/2 - 70, 15, 30, WHITE);
 			DrawFPS(WIDTH - 100, HEIGHT - 30);
 		EndDrawing();
