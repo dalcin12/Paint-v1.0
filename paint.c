@@ -22,6 +22,10 @@
 #define POS_Y_THICKNESS_RECT POS_Y_COLOR_RECT
 #define WIDTH_RECT 40
 #define HEIGHT_RECT 40
+
+#define WIDTH_CLEAR_BUTTON 50
+#define HEIGHT_CLEAR_BUTTON 30
+#define CLEAR_TEXT_SIZE 10
 // #define INITIAL_SIZE 20
 
 //	int size = 0;
@@ -120,22 +124,20 @@ Vector2 buttonPos = {(WIDTH-50)/2, HEIGHT - 50};
 
 void createClearBackgroundButton(Circle *circlesArray, int size){
 	Vector2 mousePos = GetMousePosition();
-	if(mousePos.x < (buttonPos.x + 50) && mousePos.y < (buttonPos.y + 50) &&
-	mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y) 
+	if (mousePos.x < (buttonPos.x + WIDTH_CLEAR_BUTTON) && mousePos.y < (buttonPos.y + HEIGHT_CLEAR_BUTTON) &&
+		mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y) 
 	){
-		DrawRectangle(buttonPos.x, buttonPos.y , 50,30, RED);
-		DrawText("CLEAR", buttonPos.x, buttonPos.y, 10, WHITE);
-		if(IsMouseButtonPressed(0)){
+		DrawRectangle(buttonPos.x, buttonPos.y, WIDTH_CLEAR_BUTTON, HEIGHT_CLEAR_BUTTON, RED);
+		DrawText("CLEAR", (buttonPos.x + WIDTH_CLEAR_BUTTON / 6), (buttonPos.y + HEIGHT_CLEAR_BUTTON / 3), CLEAR_TEXT_SIZE, WHITE);
+		if (IsMouseButtonPressed(0)){
 			memset(circlesArray, 0, size*sizeof(Circle)); //para dar clear na memoria por meio da lib string.h
 			i = 0;
 		}
-	}else{
-		DrawRectangle(buttonPos.x, buttonPos.y , 50,30, WHITE);
-		DrawText("CLEAR", buttonPos.x, buttonPos.y, 10, RED);
+	} else {
+		DrawRectangle(buttonPos.x, buttonPos.y, WIDTH_CLEAR_BUTTON, HEIGHT_CLEAR_BUTTON, WHITE);
+		DrawText("CLEAR", (buttonPos.x + WIDTH_CLEAR_BUTTON / 6), (buttonPos.y + HEIGHT_CLEAR_BUTTON / 3), CLEAR_TEXT_SIZE, RED);
 	}
 }
-
-
 
 void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
@@ -147,10 +149,10 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 			if (mousePos.x == circlesA[j].positions.x && mousePos.y == circlesA[j].positions.y) {
 				canDraw = 0;
 			}
-			if(mousePos.x < (buttonPos.x + 50) && mousePos.y < (buttonPos.y + 50) &&
-	mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y)){
-		canDraw = 0;
-	}
+		}
+		if (mousePos.x < (buttonPos.x + WIDTH_CLEAR_BUTTON) && mousePos.y < (buttonPos.y + HEIGHT_CLEAR_BUTTON) &&
+		mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y)) {
+			canDraw = 0;
 		}
 		if (canDraw) {
 			HideCursor();
@@ -172,7 +174,6 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 }
 
 int main() {
-	Circle *circlesArray = (Circle *)malloc(500 * sizeof(Circle));
 	Color colors[NUMBER_COLORS] = {WHITE, RED, GREEN, BLUE, PURPLE, ORANGE, BLACK};
 	int thickness[NUMBER_THICKNESSES] = {LARGE, MEDIUM, SMALL};
 	InitWindow(WIDTH, HEIGHT, "Paint v1.0");
