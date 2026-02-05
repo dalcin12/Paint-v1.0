@@ -163,8 +163,8 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 	};
 
 	for (int j = 0; j < i; j++) {
-		//DrawCircle(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].thickness, circlesA[j].color);
-		DrawPixel(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].color);
+		DrawCircle(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].thickness, circlesA[j].color);
+		//DrawPixel(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].color);
 		
 	}
 
