@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
+#include <string.h>
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -21,6 +22,10 @@
 #define POS_Y_THICKNESS_RECT POS_Y_COLOR_RECT
 #define WIDTH_RECT 40
 #define HEIGHT_RECT 40
+
+#define WIDTH_CLEAR_BUTTON 50
+#define HEIGHT_CLEAR_BUTTON 30
+#define CLEAR_TEXT_SIZE 10
 // #define INITIAL_SIZE 20
 
 //	int size = 0;
@@ -87,7 +92,7 @@ Color getColor(Vector2 mousePos, Color* colors) {
 // int thicknessArray[MAX_THICKNESS];
 int actualThickness = SMALL;
 
-Circle circlesArray[50000];
+Circle circlesArray[WIDTH * HEIGHT]; // WIDTH * HEIGHT will cover up all the screen pixels
 
 void createThicknessButtons(int* thickness) {
 	for (int j = 0; j < NUMBER_THICKNESSES; j++) {
@@ -114,6 +119,26 @@ int getThickness(Vector2 mousePos, int* thickness) {
 
 int i = 0;
 
+//Clear background
+Vector2 buttonPos = {(WIDTH-50)/2, HEIGHT - 50};
+
+void createClearBackgroundButton(Circle *circlesArray, int size){
+	Vector2 mousePos = GetMousePosition();
+	if (mousePos.x < (buttonPos.x + WIDTH_CLEAR_BUTTON) && mousePos.y < (buttonPos.y + HEIGHT_CLEAR_BUTTON) &&
+		mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y) 
+	){
+		DrawRectangle(buttonPos.x, buttonPos.y, WIDTH_CLEAR_BUTTON, HEIGHT_CLEAR_BUTTON, RED);
+		DrawText("CLEAR", (buttonPos.x + WIDTH_CLEAR_BUTTON / 6), (buttonPos.y + HEIGHT_CLEAR_BUTTON / 3), CLEAR_TEXT_SIZE, WHITE);
+		if (IsMouseButtonPressed(0)){
+			memset(circlesArray, 0, size*sizeof(Circle)); //para dar clear na memoria por meio da lib string.h
+			i = 0;
+		}
+	} else {
+		DrawRectangle(buttonPos.x, buttonPos.y, WIDTH_CLEAR_BUTTON, HEIGHT_CLEAR_BUTTON, WHITE);
+		DrawText("CLEAR", (buttonPos.x + WIDTH_CLEAR_BUTTON / 6), (buttonPos.y + HEIGHT_CLEAR_BUTTON / 3), CLEAR_TEXT_SIZE, RED);
+	}
+}
+
 void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 	Vector2 mousePos = GetMousePosition();
 	if (IsMouseButtonDown(0)) {
@@ -125,6 +150,10 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 				canDraw = 0;
 			}
 		}
+		if (mousePos.x < (buttonPos.x + WIDTH_CLEAR_BUTTON) && mousePos.y < (buttonPos.y + HEIGHT_CLEAR_BUTTON) &&
+		mousePos.x > (buttonPos.x) && mousePos.y > (buttonPos.y)) {
+			canDraw = 0;
+		}
 		if (canDraw) {
 			HideCursor();
 			circlesA[i].positions.x = mousePos.x;
@@ -135,6 +164,7 @@ void drawCircleOnMouse(int* thickness, Circle* circlesA, Color* colors) {
 
 	for (int j = 0; j < i; j++) {
 		DrawCircle(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].thickness, circlesA[j].color);
+		//DrawPixel(circlesA[j].positions.x, circlesA[j].positions.y, circlesA[j].color);
 		
 	}
 
@@ -154,6 +184,7 @@ int main() {
 			drawCircleOnMouse(thickness, circlesArray, colors);
 			createColorButtons(colors);
 			createThicknessButtons(thickness);
+			createClearBackgroundButton(circlesArray, i);
 			DrawText("Paint v1.0", WIDTH/2 - 70, 15, 30, WHITE);
 			DrawFPS(WIDTH - 100, HEIGHT - 30);
 		EndDrawing();
